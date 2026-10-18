@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>8-bit Two-stroke</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #1f2328;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1117;
+        --fg: #e6edf3;
+      }
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin: 0;
+      padding: 0.5rem;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .status,
+    .divider,
+    .logo,
+    .name {
+      margin-top: 1.2em;
+    }
+
+    .ascii {
+      margin: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      font: inherit;
+      white-space: pre;
+      font-variant-ligatures: none;
+    }
+
+    .name {
+      text-align: center;
+    }
+
+    .line {
+      display: block;
+    }
+
+    .pending {
+      display: none;
+    }
+
+    .ch {
+      visibility: hidden;
+    }
+
+    .ch.shown {
+      visibility: visible;
+    }
+
+    .ch.cursor {
+      position: relative;
+    }
+
+    .ch.cursor::after {
+      content: "";
+      position: absolute;
+      left: 100%;
+      top: 0;
+      width: 1ch;
+      height: 1.2em;
+      background: currentColor;
+    }
+  </style>
+</head>
+<body>
+  <p>8b2T.com: Hello World <span class="timestamp"></span></p>
+  <p class="status">Work in progress...</p>
+  <p class="divider" aria-hidden="true">********************************</p>
+  <div class="logo">
+    <pre class="ascii" role="img" aria-label="ASCII art logo">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--._.--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/_//_...........___&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;___\//_------&nbsp;&nbsp;&nbsp;&nbsp;_____/\&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;-'___//&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;\\&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;//&nbsp;\&nbsp;&nbsp;\&nbsp;___\\/&nbsp;&nbsp;----&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;|&nbsp;&nbsp;//&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;\----.&nbsp;&nbsp;\&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;\____/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\____/&nbsp;&nbsp;&nbsp;&nbsp;</pre>
+    <p class="name">8-bit Two-stroke</p>
+  </div>
+  <p class="divider" aria-hidden="true">********************************</p>
+
+  <script>
+    (function () {
+      var now = new Date();
+      function pad(n) { return String(n).padStart(2, "0"); }
+      document.querySelector(".timestamp").textContent =
+        "[" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) +
+        " " + pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds()) + "]";
+
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      var CHAR_DELAY = 40;
+      var LINE_DELAY = 160;
+      var BLOCK_DELAY = 400;
+
+      function wrap(el) {
+        var lines = el.textContent.split("\n");
+        el.textContent = "";
+        el.classList.add("pending");
+        return lines.map(function (text) {
+          var line = document.createElement("span");
+          line.className = "line pending";
+          var spans = Array.from(text, function (c) {
+            var span = document.createElement("span");
+            span.className = "ch";
+            span.textContent = c;
+            line.appendChild(span);
+            return span;
+          });
+          el.appendChild(line);
+          return { el: el, line: line, spans: spans };
+        });
+      }
+
+      var blocks = Array.from(document.querySelectorAll(".status, .divider, .ascii, .name"), wrap);
+      var cursorOn = null;
+
+      function moveCursor(span) {
+        if (cursorOn) cursorOn.classList.remove("cursor");
+        if (span) span.classList.add("cursor");
+        cursorOn = span;
+      }
+
+      function typeLine(l, done) {
+        l.el.classList.remove("pending");
+        l.line.classList.remove("pending");
+        var i = 0;
+        (function step() {
+          while (i < l.spans.length) {
+            var span = l.spans[i++];
+            span.classList.add("shown");
+            moveCursor(span);
+            if (span.textContent.trim()) break;
+          }
+          setTimeout(i < l.spans.length ? step : done, i < l.spans.length ? CHAR_DELAY : LINE_DELAY);
+        })();
+      }
+
+      function typeLines(lines, done) {
+        var n = 0;
+        (function next() {
+          if (n < lines.length) typeLine(lines[n++], next);
+          else done();
+        })();
+      }
+
+      var b = 0;
+      (function nextBlock() {
+        if (b < blocks.length) {
+          var lines = blocks[b++];
+          setTimeout(function () { typeLines(lines, nextBlock); }, BLOCK_DELAY);
+        } else {
+          moveCursor(null);
+        }
+      })();
+    })();
+  </script>
+</body>
+</html>
