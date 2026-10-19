@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://8b2t.com/">
   <meta property="og:site_name" content="8-bit Two-stroke">
   <meta property="og:title" content="8-bit Two-stroke">
-  <meta property="og:description" content="[F]un [A]rt [S]peed [T]echnology">
+  <meta property="og:description" content="Beep boop ring-a-ding">
   <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://8b2t.com/poster.jpg">
   <meta property="og:image:secure_url" content="https://8b2t.com/poster.jpg">
@@ -67,6 +67,8 @@
 
     .status,
     .divider,
+    .fast,
+    .soon,
     .logo,
     .name {
       margin-top: 1.2em;
@@ -85,8 +87,13 @@
       text-align: center;
     }
 
+    .fast {
+      white-space: pre-line;
+    }
+
     .line {
       display: block;
+      min-height: 1.2em;
     }
 
     .pending {
@@ -131,6 +138,13 @@
     <p class="name">8-bit Two-stroke</p>
   </div>
   <p class="divider" aria-hidden="true">********************************</p>
+  <p class="fast">We do F.A.S.T.
+
+<span data-words="Fun,Functional,Fresh,Funky">Fun</span>
+<span data-words="Artful,Adventurous,Animated,Awesome">Artful</span>
+<span data-words="Smiling,Speedy,Silly,Shiny">Smiling</span>
+<span data-words="Tech,Toys,Tools,Trinkets">Tech</span></p>
+  <p class="soon">More coming soon...</p>
 
   <script>
     (function () {
@@ -140,11 +154,16 @@
         "[" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) +
         " " + pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds()) + "]";
 
+      document.querySelectorAll("[data-words]").forEach(function (el) {
+        var words = el.dataset.words.split(",");
+        el.textContent = words[Math.floor(Math.random() * words.length)];
+      });
+
       if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
-      var CHAR_DELAY = 40;
-      var LINE_DELAY = 160;
-      var BLOCK_DELAY = 400;
+      var CHAR_DELAY = 20;
+      var LINE_DELAY = 100;
+      var BLOCK_DELAY = 300;
 
       function wrap(el) {
         var lines = el.textContent.split("\n");
@@ -165,7 +184,7 @@
         });
       }
 
-      var blocks = Array.from(document.querySelectorAll(".status, .divider, .ascii, .name"), wrap);
+      var blocks = Array.from(document.querySelectorAll(".status, .divider, .ascii, .name, .fast, .soon"), wrap);
       var cursorOn = null;
 
       function moveCursor(span) {
@@ -202,8 +221,6 @@
         if (b < blocks.length) {
           var lines = blocks[b++];
           setTimeout(function () { typeLines(lines, nextBlock); }, BLOCK_DELAY);
-        } else {
-          moveCursor(null);
         }
       })();
     })();
