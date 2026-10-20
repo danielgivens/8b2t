@@ -67,8 +67,6 @@
 
     .status,
     .divider,
-    .fast,
-    .soon,
     .logo,
     .name {
       margin-top: 1.2em;
@@ -87,13 +85,8 @@
       text-align: center;
     }
 
-    .fast {
-      white-space: pre-line;
-    }
-
     .line {
       display: block;
-      min-height: 1.2em;
     }
 
     .pending {
@@ -138,13 +131,6 @@
     <p class="name">8-bit Two-stroke</p>
   </div>
   <p class="divider" aria-hidden="true">********************************</p>
-  <p class="fast">We do F.A.S.T.
-
-<span data-words="Fun,Functional,Fresh,Funky">Fun</span>
-<span data-words="Artful,Adventurous,Animated,Awesome">Artful</span>
-<span data-words="Smiling,Speedy,Silly,Shiny">Smiling</span>
-<span data-words="Tech,Toys,Tools,Trinkets">Tech</span></p>
-  <p class="soon">More coming soon...</p>
 
   <script>
     (function () {
@@ -153,11 +139,6 @@
       document.querySelector(".timestamp").textContent =
         "[" + now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) +
         " " + pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds()) + "]";
-
-      document.querySelectorAll("[data-words]").forEach(function (el) {
-        var words = el.dataset.words.split(",");
-        el.textContent = words[Math.floor(Math.random() * words.length)];
-      });
 
       if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
@@ -184,7 +165,7 @@
         });
       }
 
-      var blocks = Array.from(document.querySelectorAll(".status, .divider, .ascii, .name, .fast, .soon"), wrap);
+      var blocks = Array.from(document.querySelectorAll(".status, .divider, .ascii, .name"), wrap);
       var cursorOn = null;
 
       function moveCursor(span) {
@@ -221,6 +202,8 @@
         if (b < blocks.length) {
           var lines = blocks[b++];
           setTimeout(function () { typeLines(lines, nextBlock); }, BLOCK_DELAY);
+        } else {
+          moveCursor(null);
         }
       })();
     })();
