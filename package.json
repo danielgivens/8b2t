@@ -1,0 +1,12 @@
+{
+  "name": "8b2t-site",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/build-leeen.mjs && tailwindcss -i src/styles.css -o leeen/styles.css --minify",
+    "preview": "python3 -m http.server 8080 --bind 127.0.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
+  }
+}

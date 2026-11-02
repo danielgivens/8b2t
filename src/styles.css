@@ -1,0 +1,13 @@
+@import "tailwindcss" source(none);
+@source "./leeen.html";
+@source "../scripts/build-leeen.mjs";
+
+@layer base {
+  html { scroll-padding-top: 2rem; }
+  a { text-underline-offset: 0.2em; }
+  a:focus-visible, summary:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+  summary { cursor: pointer; }
+}
